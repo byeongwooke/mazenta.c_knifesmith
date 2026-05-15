@@ -4,42 +4,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mazenta.c_knifesmith — Enter</title>
+  <title>mazenta.c_knifesmith — The Razor-Cut Archive</title>
   <meta name="description" content="mazenta.c_knifesmith — 30년의 기록, 날의 철학. 금속 작가의 공간으로 입장하십시오." />
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap"
     rel="stylesheet" />
   <style>
-    /* ─── Reset ───────────────────────────────────────────── */
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    /* ─── Base Styles & Variables ────────────────────────── */
     :root {
-      --magenta: #8B004B; /* 지정해주신 마젠타 색상 */
-      --black: #0D0D0D;   /* 철학적 블랙 (Obsidian) */
-      --white: #F8F8F8;   /* 철학적 화이트 (Bone White) */
+      --magenta: #8B004B;
+      --black: #0D0D0D;
+      --white: #F8F8F8;
       --mono: 'Space Mono', monospace;
       --serif: 'IM Fell English', serif;
     }
 
-    html,
-    body {
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
       width: 100%;
       height: 100%;
-      overflow: hidden;
       background: var(--black);
+      color: var(--black);
+      font-family: var(--serif);
+      overflow-x: hidden;
     }
 
-    /* ═══════════════════════════════════════════════════════
-       [Main_Entry] — 진입 화면 (화이트 배경)
-    ═══════════════════════════════════════════════════════ */
+    /* ─── Cinematic Entry Layers ─────────────────────────── */
+    #Loading_Overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--black);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #loading-text {
+      position: relative;
+      z-index: 10010;
+      font-family: var(--mono);
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      color: var(--white);
+      letter-spacing: 0.2em;
+      white-space: nowrap;
+      border-right: 2px solid var(--white);
+    }
+
+    #Center_Line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: var(--white);
+      transform: translateY(-50%) scaleX(0);
+      z-index: 10005;
+    }
+
+    #Top_Panel, #Bottom_Panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: var(--black);
+      z-index: 10000;
+      transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    #Top_Panel { top: 0; } #Bottom_Panel { bottom: 0; }
+    #Top_Panel.open { transform: translateY(-100%); }
+    #Bottom_Panel.open { transform: translateY(100%); }
+
     #Main_Entry {
       position: fixed;
       inset: 0;
@@ -49,168 +89,173 @@
       align-items: center;
       justify-content: center;
       gap: 2.6rem;
-      z-index: 1;
+      z-index: 1000;
+      transition: opacity 1s ease, transform 1s ease;
     }
 
-    /* 코너 프레임 장식 */
-    #Main_Entry::before,
-    #Main_Entry::after {
-      content: '';
-      position: absolute;
-      width: 48px;
-      height: 48px;
-      border-color: rgba(139, 0, 75, 0.15);
-      border-style: solid;
+    #Main_Entry.exit {
+      opacity: 0;
+      transform: scale(1.1);
+      pointer-events: none;
     }
 
-    #Main_Entry::before {
-      top: 2rem;
-      left: 2rem;
-      border-width: 1px 0 0 1px;
-    }
-
-    #Main_Entry::after {
-      bottom: 2rem;
-      right: 2rem;
-      border-width: 0 1px 1px 0;
-    }
-
-    /* 로고 스타일: 지정 마젠타 + 검정 외곽선 */
     #logo {
       font-family: var(--serif);
       font-size: clamp(1.6rem, 4vw, 2.8rem);
-      letter-spacing: 0.05em;
       color: var(--magenta);
       -webkit-text-stroke: 1px var(--black);
-      text-stroke: 1px var(--black);
       text-align: center;
       line-height: 1.3;
       opacity: 0;
       transform: translateY(12px);
       animation: riseIn 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
       animation-delay: 0.3s;
-      user-select: none;
     }
 
     #logo .sub {
       display: block;
       font-family: var(--mono);
       font-size: 0.32em;
-      letter-spacing: 0.28em;
       color: var(--black);
       -webkit-text-stroke: 0px;
-      font-style: normal;
       margin-top: 0.7em;
       opacity: 0.6;
       text-transform: uppercase;
+      letter-spacing: 0.28em;
     }
 
-    /* 바로가기 버튼 */
     #cta-btn {
       font-family: var(--mono);
       font-size: 0.8rem;
-      letter-spacing: 0.2em;
       color: var(--white);
       background: var(--black);
       border: none;
       padding: 0.85rem 2.6rem;
       cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      outline: none;
       opacity: 0;
       animation: fadeIn 0.8s ease forwards;
       animation-delay: 0.9s;
       transition: background 0.35s ease;
+      letter-spacing: 0.2em;
     }
+    #cta-btn:hover { background: var(--magenta); }
 
-    #cta-btn:hover {
-      background: var(--magenta);
+    /* ─── The Razor-Cut Archive Content ─────────────────── */
+    #Archive_Content {
+      display: none;
+      background-color: var(--white);
+      min-height: 100vh;
+      opacity: 0;
+      transition: opacity 1.5s ease;
     }
+    #Archive_Content.visible { display: block; opacity: 1; }
 
-    /* ═══════════════════════════════════════════════════════
-       [Loading_Overlay] — 로딩 화면 (블랙 배경)
-    ═══════════════════════════════════════════════════════ */
-    #Loading_Overlay {
+    /* Custom Cursor */
+    body.show-cursor { cursor: none; }
+    #razor-cursor {
       position: fixed;
+      width: 1px;
+      height: 100vh;
+      background: var(--magenta);
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: difference;
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.1s ease-out;
+    }
+    body.show-cursor #razor-cursor { opacity: 0.8; }
+
+    /* Grid & Slice Effects */
+    .museum-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1px;
+      background-color: rgba(13, 13, 13, 0.1);
+      border-top: 1px solid var(--black);
+    }
+
+    .grid-cell {
+      background-color: var(--white);
+      min-height: 400px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .slice-trigger:hover .slice-content {
+      transform: skewX(-2deg) translateX(5px);
+      transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .magenta-line {
+      width: 2px;
+      height: 0;
+      background-color: var(--magenta);
+      transition: height 1s ease;
+    }
+    .reveal-line.active { height: 100px; }
+
+    .metadata {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--magenta);
+      margin-bottom: 1rem;
+    }
+
+    .museum-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(100%);
+      transition: filter 0.8s cubic-bezier(0.23, 1, 0.32, 1), transform 0.8s ease;
+    }
+    .grid-cell:hover .museum-image { filter: grayscale(0%); transform: scale(1.05); }
+
+    .raw-overlay {
+      position: absolute;
       inset: 0;
       background: var(--black);
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+    .grid-cell:hover .raw-overlay { opacity: 0.05; }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    /* 로딩 텍스트 - 레이어 최상단 배치 */
-    #loading-text {
-      position: relative;
-      z-index: 1010; /* 패널보다 위에 오도록 설정 */
-      font-family: var(--mono);
-      font-size: clamp(1rem, 2.5vw, 1.3rem);
-      color: var(--white);
-      letter-spacing: 0.2em;
-      white-space: nowrap;
-      border-right: 2px solid var(--white);
-    }
-
-    /* 중앙 가로선 */
-    #Center_Line {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 50%;
-      height: 1px;
-      background: var(--white);
-      transform: translateY(-50%) scaleX(0);
-      z-index: 1005;
-    }
-
-    /* 여닫이 패널 */
-    #Top_Panel,
-    #Bottom_Panel {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 50%;
-      background: var(--black);
-      z-index: 1000;
-      will-change: transform;
-      transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
-    }
-
-    #Top_Panel { top: 0; }
-    #Bottom_Panel { bottom: 0; }
-
-    #Top_Panel.open { transform: translateY(-100%); }
-    #Bottom_Panel.open { transform: translateY(100%); }
-
-    .line-expand { animation: lineExpand 0.4s ease forwards; }
-
-    @keyframes lineExpand {
-      to { transform: translateY(-50%) scaleX(1); }
-    }
-
+    @keyframes lineExpand { to { transform: translateY(-50%) scaleX(1); } }
     @keyframes riseIn { to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { to { opacity: 1; } }
     @keyframes caretBlink {
       0%, 100% { border-right-color: var(--white); }
       50% { border-right-color: transparent; }
     }
-
-    /* 미세한 질감 오버레이 */
-    .grain {
-      position: fixed;
-      inset: 0;
-      z-index: 998;
-      pointer-events: none;
-      opacity: 0.03;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
   </style>
 </head>
 
 <body>
+  <!-- Cinematic Entry Sequence -->
+  <div id="Loading_Overlay">
+    <div id="Top_Panel"></div>
+    <div id="Center_Line"></div>
+    <div id="Bottom_Panel"></div>
+    <span id="loading-text"></span>
+  </div>
+
   <div id="Main_Entry">
     <h1 id="logo">
       @mazenta.c_knifesmith
@@ -219,17 +264,87 @@
     <button id="cta-btn"><span>바로가기</span></button>
   </div>
 
-  <div class="grain"></div>
+  <!-- The Razor-Cut Archive Content -->
+  <div id="Archive_Content">
+    <div id="razor-cursor"></div>
+    <div class="grain"></div>
 
-  <div id="Loading_Overlay">
-    <div id="Top_Panel"></div>
-    <div id="Center_Line"></div>
-    <div id="Bottom_Panel"></div>
-    <span id="loading-text"></span>
+    <header class="p-8 flex justify-between items-center border-b border-black">
+      <div class="text-2xl font-bold tracking-tighter">MAZENTA.C</div>
+      <nav class="font-mono text-xs space-x-8 uppercase tracking-widest">
+        <a href="#" class="hover:text-[#8B004B]">Archive</a>
+        <a href="#" class="hover:text-[#8B004B]">Process</a>
+        <a href="#" class="hover:text-[#8B004B]">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Hero Section -->
+      <section class="min-h-screen flex flex-col justify-center px-8 py-20 border-b border-black">
+        <div class="max-w-4xl">
+          <div class="magenta-line reveal-line mb-8"></div>
+          <h2 class="text-6xl md:text-8xl mb-8 leading-none italic">The Edge of <br>32 Years.</h2>
+          <p class="font-mono text-sm max-w-md opacity-70">
+            1994년부터 시작된 날의 고찰. <br>
+            금속이 견뎌낸 열기와 작가의 손끝이 만나는 예리한 경계.
+          </p>
+        </div>
+      </section>
+
+      <!-- Museum Grid Archive -->
+      <section class="museum-grid">
+        <!-- Item 1: Museum Quality -->
+        <div class="grid-cell col-span-12 md:col-span-8 border-r border-black slice-trigger">
+          <div class="metadata">Project 01 / Damascus Study</div>
+          <div class="slice-content">
+            <div class="w-full bg-stone-200 aspect-[16/9] mb-6 flex items-center justify-center overflow-hidden">
+              <img src="damascus_knife_museum_1778819820484.png" alt="Damascus Knife" class="museum-image">
+            </div>
+            <h3 class="text-3xl italic">경계에 대한 고찰 (2022)</h3>
+          </div>
+          <div class="raw-overlay"></div>
+        </div>
+
+        <!-- Item 2: Raw Blacksmith -->
+        <div class="grid-cell col-span-12 md:col-span-4 bg-[#0D0D0D] text-[#F8F8F8]">
+          <div class="metadata text-white opacity-50">Process / The Heat</div>
+          <div class="w-full h-80 bg-zinc-800 mb-6 flex items-center justify-center overflow-hidden">
+            <img src="blacksmith_forge_raw_1778819837313.png" alt="Blacksmith Workshop" class="museum-image opacity-60">
+          </div>
+          <p class="text-sm font-mono leading-relaxed">
+            1200도의 열기 속에서 <br>
+            쇠는 비로소 정직해진다. <br>
+            망치 소리만이 유일한 대화.
+          </p>
+        </div>
+
+        <!-- Item 3: Philosophy Text Grid -->
+        <div class="grid-cell col-span-12 md:col-span-4 border-r border-black flex flex-col justify-between">
+          <div class="magenta-line w-full h-[1px] active"></div>
+          <p class="text-4xl italic leading-tight py-12">
+            "칼은 베는 도구가 <br>아닌, 나를 비추는 <br><span class="text-[#8B004B]">거울</span>이다."
+          </p>
+          <div class="metadata">Master Jung Deuk-mook</div>
+        </div>
+
+        <!-- Item 4: More Archive -->
+        <div class="grid-cell col-span-12 md:col-span-8 overflow-hidden">
+          <img src="metal_texture_abstract_1778819851321.png" alt="Metal Texture" class="museum-image opacity-40">
+          <div class="absolute inset-0 flex items-center justify-center">
+             <span class="text-xs font-mono tracking-widest uppercase text-black/50">Texture Archive 01</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="p-20 bg-[#0D0D0D] text-[#F8F8F8] flex flex-col items-center">
+      <div class="text-[#8B004B] font-mono text-xs tracking-widest mb-4">EST. 1994</div>
+      <div class="text-sm opacity-50 font-mono">© 2026 MAZENTA.C_KNIFESMITH</div>
+    </footer>
   </div>
 
   <script>
-    // 금속 마찰음 합성
+    // Audio Synthesis for Metal Scrape
     function playMetalScrape() {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -249,6 +364,7 @@
       } catch (e) {}
     }
 
+    // Loading & Shoji Animation
     const FULL_TEXT = 'Loading...'; 
     const CHAR_DELAY = 100;
     const TOTAL_HOLD = 5000;
@@ -279,6 +395,37 @@
         }, 1300);
       }, 400);
     }
+
+    // Main Entry to Archive Transition
+    document.getElementById('cta-btn').addEventListener('click', () => {
+      document.getElementById('Main_Entry').classList.add('exit');
+      setTimeout(() => {
+        const archive = document.getElementById('Archive_Content');
+        archive.classList.add('visible');
+        document.body.classList.add('show-cursor');
+        // Initial observer trigger
+        const revealLines = document.querySelectorAll('.reveal-line');
+        revealLines.forEach(line => observer.observe(line));
+      }, 800);
+    });
+
+    // Razor Cursor Movement
+    const cursor = document.getElementById('razor-cursor');
+    document.addEventListener('mousemove', (e) => {
+      if (document.body.classList.contains('show-cursor')) {
+        cursor.style.transform = `translateX(${e.clientX}px)`;
+      }
+    });
+
+    // Scroll Reveal Observer
+    const observerOptions = { threshold: 0.1 };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, observerOptions);
 
     document.addEventListener('DOMContentLoaded', () => {
       typeChar();
