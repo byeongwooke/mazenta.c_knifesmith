@@ -42,8 +42,8 @@
     #Loading_Overlay {
       position: fixed;
       inset: 0;
-      background: var(--black);
-      z-index: 10000;
+      background: transparent;
+      z-index: 999;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -66,19 +66,21 @@
       left: 0;
       right: 0;
       top: 50%;
-      height: 1px;
+      height: 2px;
       background: var(--white);
       transform: translateY(-50%) scaleX(0);
-      z-index: 10005;
+      z-index: 1100;
+      transform-origin: center;
     }
 
     #Top_Panel, #Bottom_Panel {
       position: absolute;
       left: 0;
       right: 0;
-      height: 50%;
+      height: 50.5%;
       background: var(--black);
-      z-index: 10000;
+      z-index: 1000;
+      will-change: transform;
       transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
     }
     #Top_Panel { top: 0; } #Bottom_Panel { bottom: 0; }
