@@ -20,7 +20,14 @@
 
     /* Loading Overlay Layer [cite: 70, 93] */
     #Loading_Overlay { position: fixed; inset: 0; background: #000000; z-index: 999; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    #loading-text { font-family: var(--mono); font-size: clamp(1rem, 2.5vw, 1.5rem); color: #FFFFFF; border-right: 2px solid #FFFFFF; }
+    #loading-text {
+      font-family: var(--mono);
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      color: #FFFFFF;
+      border-right: 2px solid #FFFFFF;
+      position: relative;
+      z-index: 10;
+    }
     #Center_Line { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #FFFFFF; transform: translateY(-50%) scaleX(0); }
     #Top_Panel, #Bottom_Panel { position: absolute; left: 0; right: 0; height: 50%; background: #000000; transition: transform 1s ease-in-out; }
     #Top_Panel { top: 0; } #Bottom_Panel { bottom: 0; }
