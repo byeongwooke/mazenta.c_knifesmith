@@ -1,49 +1,226 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>mazenta.c_knifesmith — Enter</title>
+  <meta name="description" content="mazenta.c_knifesmith — 30년의 기록, 날의 철학. 금속 작가의 공간으로 입장하십시오." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap"
+    rel="stylesheet" />
   <style>
-    /* Reset & Variables */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --magenta: #e0006e; --black: #000000; --white: #ffffff; --mono: 'Space Mono', monospace; --serif: 'IM Fell English', serif; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--black); }
-
-    /* Main Entry Layer [cite: 78, 93] */
-    #Main_Entry { position: fixed; inset: 0; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.6rem; z-index: 1; }
-    #logo { font-family: var(--serif); font-size: clamp(1.6rem, 4vw, 2.8rem); color: var(--magenta); -webkit-text-stroke: 1px var(--black); text-align: center; opacity: 0; transform: translateY(12px); animation: riseIn 1s ease forwards; animation-delay: 0.3s; }
-    #cta-btn { font-family: var(--mono); font-size: 0.8rem; color: #FFFFFF; background: #000000; border: none; padding: 0.85rem 2.6rem; cursor: pointer; opacity: 0; animation: fadeIn 0.8s ease forwards; animation-delay: 0.9s; }
-
-    /* Loading Overlay Layer [cite: 70, 93] */
-    #Loading_Overlay { position: fixed; inset: 0; background: #000000; z-index: 999; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    #loading-text {
-      font-family: var(--mono);
-      font-size: clamp(1rem, 2.5vw, 1.5rem);
-      color: #FFFFFF;
-      border-right: 2px solid #FFFFFF;
-      position: relative;
-      z-index: 10;
+    /* ─── Reset ───────────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    #Center_Line { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #FFFFFF; transform: translateY(-50%) scaleX(0); }
-    #Top_Panel, #Bottom_Panel { position: absolute; left: 0; right: 0; height: 50%; background: #000000; transition: transform 1s ease-in-out; }
-    #Top_Panel { top: 0; } #Bottom_Panel { bottom: 0; }
-    #Top_Panel.open { transform: translateY(-100%); } #Bottom_Panel.open { transform: translateY(100%); }
-    .line-expand { animation: lineExpand 0.22s ease forwards; }
-    @keyframes lineExpand { to { transform: translateY(-50%) scaleX(1); } }
+
+    :root {
+      --magenta: #8B004B; /* 지정해주신 마젠타 색상 */
+      --black: #0D0D0D;   /* 철학적 블랙 (Obsidian) */
+      --white: #F8F8F8;   /* 철학적 화이트 (Bone White) */
+      --mono: 'Space Mono', monospace;
+      --serif: 'IM Fell English', serif;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--black);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       [Main_Entry] — 진입 화면 (화이트 배경)
+    ═══════════════════════════════════════════════════════ */
+    #Main_Entry {
+      position: fixed;
+      inset: 0;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2.6rem;
+      z-index: 1;
+    }
+
+    /* 코너 프레임 장식 */
+    #Main_Entry::before,
+    #Main_Entry::after {
+      content: '';
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border-color: rgba(139, 0, 75, 0.15);
+      border-style: solid;
+    }
+
+    #Main_Entry::before {
+      top: 2rem;
+      left: 2rem;
+      border-width: 1px 0 0 1px;
+    }
+
+    #Main_Entry::after {
+      bottom: 2rem;
+      right: 2rem;
+      border-width: 0 1px 1px 0;
+    }
+
+    /* 로고 스타일: 지정 마젠타 + 검정 외곽선 */
+    #logo {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      letter-spacing: 0.05em;
+      color: var(--magenta);
+      -webkit-text-stroke: 1px var(--black);
+      text-stroke: 1px var(--black);
+      text-align: center;
+      line-height: 1.3;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: riseIn 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation-delay: 0.3s;
+      user-select: none;
+    }
+
+    #logo .sub {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.32em;
+      letter-spacing: 0.28em;
+      color: var(--black);
+      -webkit-text-stroke: 0px;
+      font-style: normal;
+      margin-top: 0.7em;
+      opacity: 0.6;
+      text-transform: uppercase;
+    }
+
+    /* 바로가기 버튼 */
+    #cta-btn {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      color: var(--white);
+      background: var(--black);
+      border: none;
+      padding: 0.85rem 2.6rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      outline: none;
+      opacity: 0;
+      animation: fadeIn 0.8s ease forwards;
+      animation-delay: 0.9s;
+      transition: background 0.35s ease;
+    }
+
+    #cta-btn:hover {
+      background: var(--magenta);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       [Loading_Overlay] — 로딩 화면 (블랙 배경)
+    ═══════════════════════════════════════════════════════ */
+    #Loading_Overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--black);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* 로딩 텍스트 - 레이어 최상단 배치 */
+    #loading-text {
+      position: relative;
+      z-index: 1010; /* 패널보다 위에 오도록 설정 */
+      font-family: var(--mono);
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      color: var(--white);
+      letter-spacing: 0.2em;
+      white-space: nowrap;
+      border-right: 2px solid var(--white);
+    }
+
+    /* 중앙 가로선 */
+    #Center_Line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: var(--white);
+      transform: translateY(-50%) scaleX(0);
+      z-index: 1005;
+    }
+
+    /* 여닫이 패널 */
+    #Top_Panel,
+    #Bottom_Panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: var(--black);
+      z-index: 1000;
+      will-change: transform;
+      transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    #Top_Panel { top: 0; }
+    #Bottom_Panel { bottom: 0; }
+
+    #Top_Panel.open { transform: translateY(-100%); }
+    #Bottom_Panel.open { transform: translateY(100%); }
+
+    .line-expand { animation: lineExpand 0.4s ease forwards; }
+
+    @keyframes lineExpand {
+      to { transform: translateY(-50%) scaleX(1); }
+    }
+
     @keyframes riseIn { to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { to { opacity: 1; } }
-    @keyframes caretBlink { 0%, 100% { border-right-color: #FFFFFF; } 50% { border-right-color: transparent; } }
+    @keyframes caretBlink {
+      0%, 100% { border-right-color: var(--white); }
+      50% { border-right-color: transparent; }
+    }
+
+    /* 미세한 질감 오버레이 */
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 998;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
   </style>
 </head>
+
 <body>
   <div id="Main_Entry">
-    <h1 id="logo">@mazenta.c_knifesmith<br><span style="font-size:0.32em; font-family:var(--mono); color:var(--black); -webkit-text-stroke:0;">작가 정득묵</span></h1>
-    <button id="cta-btn">바로가기</button>
+    <h1 id="logo">
+      @mazenta.c_knifesmith
+      <span class="sub">작가 정득묵</span>
+    </h1>
+    <button id="cta-btn"><span>바로가기</span></button>
   </div>
+
+  <div class="grain"></div>
+
   <div id="Loading_Overlay">
     <div id="Top_Panel"></div>
     <div id="Center_Line"></div>
@@ -52,9 +229,29 @@
   </div>
 
   <script>
-    const FULL_TEXT = 'Loding...'; // [cite: 66, 95]
-    const CHAR_DELAY = 100; // 0.1s [cite: 66, 95]
-    const TOTAL_HOLD = 5000; // 5s [cite: 66, 95, 237, 243]
+    // 금속 마찰음 합성
+    function playMetalScrape() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const dur = 0.8;
+        const sr = ctx.sampleRate;
+        const buf = ctx.createBuffer(1, sr * dur, sr);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < sr * dur; i++) {
+          const t = i / sr;
+          const env = Math.pow(1 - t / dur, 2);
+          data[i] = (Math.random() * 2 - 1) * env * 0.1 + Math.sin(2 * Math.PI * 2500 * t) * env * 0.02;
+        }
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(ctx.destination);
+        src.start();
+      } catch (e) {}
+    }
+
+    const FULL_TEXT = 'Loading...'; 
+    const CHAR_DELAY = 100;
+    const TOTAL_HOLD = 5000;
     const loadingEl = document.getElementById('loading-text');
     let charIndex = 0;
 
@@ -63,23 +260,31 @@
         loadingEl.textContent += FULL_TEXT[charIndex];
         charIndex++;
         setTimeout(typeChar, CHAR_DELAY);
-      } else { loadingEl.style.animation = 'caretBlink 0.7s step-end infinite'; }
+      } else {
+        loadingEl.style.animation = 'caretBlink 0.7s step-end infinite';
+      }
     }
 
-    function startShoji() { // [cite: 76, 96, 97, 117]
+    function startShoji() {
+      playMetalScrape();
+      loadingEl.style.transition = 'opacity 0.3s ease';
       loadingEl.style.opacity = '0';
       document.getElementById('Center_Line').classList.add('line-expand');
+
       setTimeout(() => {
         document.getElementById('Top_Panel').classList.add('open');
         document.getElementById('Bottom_Panel').classList.add('open');
-        setTimeout(() => { document.getElementById('Loading_Overlay').style.display = 'none'; }, 1100);
-      }, 240);
+        setTimeout(() => {
+          document.getElementById('Loading_Overlay').style.display = 'none';
+        }, 1300);
+      }, 400);
     }
 
-    document.addEventListener('DOMContentLoaded', () => { // [cite: 236, 245, 247]
+    document.addEventListener('DOMContentLoaded', () => {
       typeChar();
-      setTimeout(startShoji, TOTAL_HOLD); // 5s fixed timing [cite: 237, 243, 248]
+      setTimeout(startShoji, TOTAL_HOLD);
     });
   </script>
 </body>
+
 </html>
