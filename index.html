@@ -1,212 +1,77 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>mazenta.c_knifesmith — Enter</title>
-  <meta name="description" content="mazenta.c_knifesmith — 30년의 기록, 날의 철학. 금속 작가의 공간으로 입장하십시오." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" />
   <style>
-    /* Reset */
+    /* Reset & Variables */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --magenta: #e0006e;
-      --magenta-hover: #ff1493;
-      --black: #000000;
-      --white: #ffffff;
-      --mono: 'Space Mono', monospace;
-      --serif: 'IM Fell English', serif;
-    }
+    :root { --magenta: #e0006e; --black: #000000; --white: #ffffff; --mono: 'Space Mono', monospace; --serif: 'IM Fell English', serif; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: var(--black); }
-    #Main_Entry {
-      position: fixed; inset: 0; background: #FFFFFF;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 2.6rem; z-index: 1;
-    }
-    #Main_Entry::before, #Main_Entry::after {
-      content: ''; position: absolute; width: 48px; height: 48px;
-      border-color: rgba(0, 0, 0, 0.12); border-style: solid;
-    }
-    #Main_Entry::before { top: 2rem; left: 2rem; border-width: 1px 0 0 1px; }
-    #Main_Entry::after { bottom: 2rem; right: 2rem; border-width: 0 1px 1px 0; }
-    .brand-rule {
-      width: 1px; height: 60px;
-      background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.3) 40%, transparent);
-      opacity: 0; animation: fadeIn 1s ease forwards; animation-delay: 0.5s;
-    }
-    .brand-rule.bottom { animation-delay: 0.7s; }
-    #logo {
-      font-family: var(--serif); font-size: clamp(1.6rem, 4vw, 2.8rem);
-      letter-spacing: 0.05em; color: var(--magenta);
-      -webkit-text-stroke: 1px var(--black); text-stroke: 1px var(--black);
-      text-align: center; line-height: 1.3; opacity: 0; transform: translateY(12px);
-      animation: riseIn 1s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: 0.3s;
-      user-select: none;
-    }
-    #logo .sub {
-      display: block; font-family: var(--mono); font-size: 0.32em;
-      letter-spacing: 0.28em; color: var(--black);
-      -webkit-text-stroke: 0px; text-stroke: 0px; font-style: normal;
-      margin-top: 0.7em; opacity: 0.45; text-transform: uppercase;
-    }
-    #cta-btn {
-      font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.2em;
-      color: #FFFFFF; background: #000000; border: none;
-      padding: 0.85rem 2.6rem; cursor: pointer; position: relative;
-      overflow: hidden; outline: none; opacity: 0;
-      animation: fadeIn 0.8s ease forwards; animation-delay: 0.9s;
-      transition: color 0.35s ease;
-    }
-    #cta-btn::before {
-      content: ''; position: absolute; inset: 0; background: var(--magenta);
-      transform: translateX(-101%); transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    #cta-btn:hover::before, #cta-btn:focus-visible::before { transform: translateX(0); }
-    #cta-btn:hover, #cta-btn:focus-visible { color: #FFFFFF; }
-    #cta-btn span { position: relative; z-index: 1; }
+
+    /* Main Entry Layer [cite: 78, 93] */
+    #Main_Entry { position: fixed; inset: 0; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.6rem; z-index: 1; }
+    #logo { font-family: var(--serif); font-size: clamp(1.6rem, 4vw, 2.8rem); color: var(--magenta); -webkit-text-stroke: 1px var(--black); text-align: center; opacity: 0; transform: translateY(12px); animation: riseIn 1s ease forwards; animation-delay: 0.3s; }
+    #cta-btn { font-family: var(--mono); font-size: 0.8rem; color: #FFFFFF; background: #000000; border: none; padding: 0.85rem 2.6rem; cursor: pointer; opacity: 0; animation: fadeIn 0.8s ease forwards; animation-delay: 0.9s; }
+
+    /* Loading Overlay Layer [cite: 70, 93] */
+    #Loading_Overlay { position: fixed; inset: 0; background: #000000; z-index: 999; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    #loading-text { font-family: var(--mono); font-size: clamp(1rem, 2.5vw, 1.5rem); color: #FFFFFF; border-right: 2px solid #FFFFFF; }
+    #Center_Line { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #FFFFFF; transform: translateY(-50%) scaleX(0); }
+    #Top_Panel, #Bottom_Panel { position: absolute; left: 0; right: 0; height: 50%; background: #000000; transition: transform 1s ease-in-out; }
+    #Top_Panel { top: 0; } #Bottom_Panel { bottom: 0; }
+    #Top_Panel.open { transform: translateY(-100%); } #Bottom_Panel.open { transform: translateY(100%); }
+    .line-expand { animation: lineExpand 0.22s ease forwards; }
+    @keyframes lineExpand { to { transform: translateY(-50%) scaleX(1); } }
     @keyframes riseIn { to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { to { opacity: 1; } }
-    #Loading_Overlay {
-      position: fixed; inset: 0; background: #000000; z-index: 999;
-      display: flex; align-items: center; justify-content: center; overflow: hidden;
-    }
-    #loading-text {
-      font-family: var(--mono); font-size: clamp(1rem, 2.5vw, 1.5rem);
-      color: #FFFFFF; letter-spacing: 0.1em; white-space: nowrap;
-      border-right: 2px solid #FFFFFF;
-    }
-    #Center_Line {
-      position: absolute; left: 0; right: 0; top: 50%; height: 1px;
-      background: #FFFFFF; transform: translateY(-50%) scaleX(0);
-      transform-origin: center; will-change: transform;
-    }
-    #Top_Panel, #Bottom_Panel {
-      position: absolute; left: 0; right: 0; height: 50%;
-      background: #000000; will-change: transform;
-    }
-    #Top_Panel { top: 0; transform: translateY(0); }
-    #Bottom_Panel { bottom: 0; transform: translateY(0); }
-    #Top_Panel.open { transform: translateY(-100%); }
-    #Bottom_Panel.open { transform: translateY(100%); }
-    .panel-transition { transition: transform 1s ease-in-out; }
-    .line-expand { animation: lineExpand 0.22s ease forwards; }
-    @keyframes lineExpand {
-      from { transform: translateY(-50%) scaleX(0); }
-      to { transform: translateY(-50%) scaleX(1); }
-    }
-    .grain {
-      position: fixed; inset: 0; z-index: 998; pointer-events: none; opacity: 0.022;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 180px 180px;
-    }
+    @keyframes caretBlink { 0%, 100% { border-right-color: #FFFFFF; } 50% { border-right-color: transparent; } }
   </style>
 </head>
-
 <body>
-  <div id="Main_Entry" aria-label="mazenta.c_knifesmith 브랜드 메인 진입 화면">
-    <div class="brand-rule" aria-hidden="true"></div>
-    <h1 id="logo">
-      @mazenta.c_knifesmith
-      <span class="sub">작가 정득묵</span>
-    </h1>
-    <div class="brand-rule bottom" aria-hidden="true"></div>
-    <button id="cta-btn" type="button" aria-label="작품 공간으로 바로가기">
-      <span>바로가기</span>
-    </button>
+  <div id="Main_Entry">
+    <h1 id="logo">@mazenta.c_knifesmith<br><span style="font-size:0.32em; font-family:var(--mono); color:var(--black); -webkit-text-stroke:0;">작가 정득묵</span></h1>
+    <button id="cta-btn">바로가기</button>
   </div>
-  <div class="grain" aria-hidden="true"></div>
-  <div id="Loading_Overlay" role="status" aria-live="polite" aria-label="로딩 중">
-    <div id="Top_Panel" aria-hidden="true"></div>
-    <div id="Center_Line" aria-hidden="true"></div>
-    <div id="Bottom_Panel" aria-hidden="true"></div>
-    <span id="loading-text" aria-label="Loading..."></span>
+  <div id="Loading_Overlay">
+    <div id="Top_Panel"></div>
+    <div id="Center_Line"></div>
+    <div id="Bottom_Panel"></div>
+    <span id="loading-text"></span>
   </div>
 
   <script>
-    function playMetalScrape() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const dur = 0.6;
-        const sr = ctx.sampleRate;
-        const buf = ctx.createBuffer(1, sr * dur, sr);
-        const data = buf.getChannelData(0);
-        for (let i = 0; i < sr * dur; i++) {
-          const t = i / sr;
-          const env = Math.pow(1 - t / dur, 2.6);
-          const noise = (Math.random() * 2 - 1);
-          const tone1 = Math.sin(2 * Math.PI * 1800 * t) * 0.14;
-          const tone2 = Math.sin(2 * Math.PI * 3400 * t) * 0.07;
-          const tone3 = Math.sin(2 * Math.PI * 5200 * t) * 0.04;
-          data[i] = (noise * 0.65 + tone1 + tone2 + tone3) * env * 0.5;
-        }
-        const src = ctx.createBufferSource();
-        src.buffer = buf;
-        const hpf = ctx.createBiquadFilter();
-        hpf.type = 'highpass'; hpf.frequency.value = 880; hpf.Q.value = 1.4;
-        const gain = ctx.createGain();
-        gain.gain.value = 0.45;
-        src.connect(hpf); hpf.connect(gain); gain.connect(ctx.destination);
-        src.start(); src.stop(ctx.currentTime + dur);
-        src.onended = () => ctx.close();
-      } catch (e) {}
-    }
-
-    const FULL_TEXT = 'Loading...';
-    const CHAR_DELAY = 100;
-    const TOTAL_HOLD = 5000;
-
+    const FULL_TEXT = 'Loding...'; // [cite: 66, 95]
+    const CHAR_DELAY = 100; // 0.1s [cite: 66, 95]
+    const TOTAL_HOLD = 5000; // 5s [cite: 66, 95, 237, 243]
     const loadingEl = document.getElementById('loading-text');
-    const overlay = document.getElementById('Loading_Overlay');
-    const topPanel = document.getElementById('Top_Panel');
-    const botPanel = document.getElementById('Bottom_Panel');
-    const centerLine = document.getElementById('Center_Line');
-
-    const blinkStyle = document.createElement('style');
-    blinkStyle.textContent = `@keyframes caretBlink { 0%, 100% { border-right-color: #FFFFFF; } 50% { border-right-color: transparent; } }`;
-    document.head.appendChild(blinkStyle);
-
     let charIndex = 0;
+
     function typeChar() {
       if (charIndex < FULL_TEXT.length) {
         loadingEl.textContent += FULL_TEXT[charIndex];
         charIndex++;
         setTimeout(typeChar, CHAR_DELAY);
-      } else {
-        loadingEl.style.animation = 'caretBlink 0.7s step-end infinite';
-      }
+      } else { loadingEl.style.animation = 'caretBlink 0.7s step-end infinite'; }
     }
 
-    function startShoji() {
-      playMetalScrape();
-      loadingEl.style.transition = 'opacity 0.25s ease';
+    function startShoji() { // [cite: 76, 96, 97, 117]
       loadingEl.style.opacity = '0';
-      centerLine.classList.add('line-expand');
+      document.getElementById('Center_Line').classList.add('line-expand');
       setTimeout(() => {
-        topPanel.classList.add('panel-transition', 'open');
-        botPanel.classList.add('panel-transition', 'open');
-        setTimeout(() => {
-          overlay.style.transition = 'opacity 0.4s ease';
-          overlay.style.opacity = '0';
-          setTimeout(() => {
-            overlay.style.display = 'none';
-            overlay.setAttribute('aria-hidden', 'true');
-          }, 420);
-        }, 1060);
+        document.getElementById('Top_Panel').classList.add('open');
+        document.getElementById('Bottom_Panel').classList.add('open');
+        setTimeout(() => { document.getElementById('Loading_Overlay').style.display = 'none'; }, 1100);
       }, 240);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => { // [cite: 236, 245, 247]
       typeChar();
-      setTimeout(startShoji, TOTAL_HOLD);
-    });
-
-    document.getElementById('cta-btn').addEventListener('click', () => {
-      window.location.href = '#';
+      setTimeout(startShoji, TOTAL_HOLD); // 5s fixed timing [cite: 237, 243, 248]
     });
   </script>
 </body>
