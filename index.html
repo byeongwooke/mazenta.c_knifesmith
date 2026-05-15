@@ -31,6 +31,11 @@
       color: var(--black);
       font-family: var(--serif);
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    @media (max-width: 768px) {
+      body { cursor: auto !important; } /* 모바일에서는 커스텀 커서 비활성화 */
     }
 
     /* ─── Cinematic Entry Layers ─────────────────────────── */
@@ -167,24 +172,66 @@
     }
     body.show-cursor #razor-cursor { opacity: 0.8; }
 
+    /* ─── Mobile Menu Overlay ─── */
+    #mobile-menu {
+      position: fixed;
+      inset: 0;
+      background-color: var(--white);
+      z-index: 5000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transform: translateY(-100%);
+      transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+    }
+
+    #mobile-menu.active {
+      transform: translateY(0);
+    }
+
+    .menu-item {
+      font-family: var(--serif);
+      font-size: 3rem;
+      font-style: italic;
+      margin: 1rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu-item::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: var(--magenta);
+      transition: width 0.4s ease;
+    }
+
+    .menu-item:hover::after {
+      width: 100%;
+    }
+
     /* Grid & Slice Effects */
     .museum-grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
       gap: 1px;
-      background-color: rgba(13, 13, 13, 0.1);
+      background-color: rgba(13, 13, 13, 0.15);
       border-top: 1px solid var(--black);
     }
 
     .grid-cell {
       background-color: var(--white);
-      min-height: 400px;
+      min-height: 320px;
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 2rem;
+      padding: 1.5rem;
     }
 
     .slice-trigger:hover .slice-content {
@@ -204,10 +251,33 @@
       font-family: var(--mono);
       font-size: 0.65rem;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.2em;
       color: var(--magenta);
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
+
+    /* ─── Hamburger Icon Animation ─── */
+    .nav-icon {
+      width: 24px;
+      height: 18px;
+      position: relative;
+      cursor: pointer;
+      z-index: 5100;
+    }
+    .nav-icon span {
+      display: block;
+      position: absolute;
+      height: 1px;
+      width: 100%;
+      background: var(--black);
+      transition: .25s ease-in-out;
+    }
+    .nav-icon span:nth-child(1) { top: 0; }
+    .nav-icon span:nth-child(2) { top: 8px; }
+    .nav-icon span:nth-child(3) { top: 16px; }
+    .nav-icon.open span:nth-child(1) { top: 8px; transform: rotate(45deg); background: var(--magenta); }
+    .nav-icon.open span:nth-child(2) { opacity: 0; }
+    .nav-icon.open span:nth-child(3) { top: 8px; transform: rotate(-45deg); background: var(--magenta); }
 
     .museum-image {
       width: 100%;
@@ -271,12 +341,24 @@
 
     <header class="p-8 flex justify-between items-center border-b border-black">
       <div class="text-2xl font-bold tracking-tighter">MAZENTA.C</div>
-      <nav class="font-mono text-xs space-x-8 uppercase tracking-widest">
-        <a href="#" class="hover:text-[#8B004B]">Archive</a>
-        <a href="#" class="hover:text-[#8B004B]">Process</a>
-        <a href="#" class="hover:text-[#8B004B]">Contact</a>
+      <nav class="hidden md:flex font-mono text-[10px] space-x-12 uppercase tracking-[0.3em]">
+        <a href="#" class="hover:text-[#8B004B] transition-colors">Archive</a>
+        <a href="#" class="hover:text-[#8B004B] transition-colors">Process</a>
+        <a href="#" class="hover:text-[#8B004B] transition-colors">Contact</a>
       </nav>
+      <div class="md:hidden nav-icon" id="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
     </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu">
+      <a href="#" class="menu-item">Archive</a>
+      <a href="#" class="menu-item">Process</a>
+      <a href="#" class="menu-item">Contact</a>
+    </div>
 
     <main>
       <!-- Hero Section -->
@@ -293,45 +375,51 @@
 
       <!-- Museum Grid Archive -->
       <section class="museum-grid">
-        <!-- Item 1: Museum Quality -->
-        <div class="grid-cell col-span-12 md:col-span-8 border-r border-black slice-trigger">
-          <div class="metadata">Project 01 / Damascus Study</div>
+        <div class="grid-cell col-span-12 p-12 md:p-20 bg-stone-50">
+          <p class="max-w-2xl text-lg md:text-2xl leading-snug italic opacity-80">
+            이 섹션은 정득묵 작가의 30년 업력을 '뮤지엄 퀄리티'와 '대장간의 날것'이라는 두 가지 시각으로 조명합니다. 
+            그리드 레이아웃은 칼날의 정교함을 상징하며, 각 칸에 마우스를 올리면 작품의 상세 제원과 제작 과정의 거친 질감이 교차하여 나타납니다.
+          </p>
+        </div>
+
+        <div class="grid-cell col-span-12 md:col-span-7 border-r border-black slice-trigger">
+          <div class="metadata">Project / Obsidian Series</div>
           <div class="slice-content">
-            <div class="w-full bg-stone-200 aspect-[16/9] mb-6 flex items-center justify-center overflow-hidden">
-              <img src="damascus_knife_museum_1778819820484.png" alt="Damascus Knife" class="museum-image">
+            <div class="w-full bg-stone-200 aspect-[4/3] mb-8 flex items-center justify-center overflow-hidden">
+               <img src="damascus_knife_museum_1778819820484.png" alt="Damascus Knife" class="museum-image">
             </div>
-            <h3 class="text-3xl italic">경계에 대한 고찰 (2022)</h3>
+            <h3 class="text-2xl md:text-4xl italic">경계에 대한 고찰 (2022)</h3>
+            <p class="mt-4 font-mono text-[10px] opacity-50 uppercase tracking-widest">Heat Treatment: 1050°C / Handle: Fossilized Oak</p>
           </div>
           <div class="raw-overlay"></div>
         </div>
 
-        <!-- Item 2: Raw Blacksmith -->
-        <div class="grid-cell col-span-12 md:col-span-4 bg-[#0D0D0D] text-[#F8F8F8]">
-          <div class="metadata text-white opacity-50">Process / The Heat</div>
-          <div class="w-full h-80 bg-zinc-800 mb-6 flex items-center justify-center overflow-hidden">
-            <img src="blacksmith_forge_raw_1778819837313.png" alt="Blacksmith Workshop" class="museum-image opacity-60">
+        <div class="grid-cell col-span-12 md:col-span-5 bg-[#0D0D0D] text-[#F8F8F8]">
+          <div class="metadata text-white opacity-40">Process / The Anvil</div>
+          <div class="w-full h-80 bg-zinc-900 mb-8 flex items-center justify-center border border-white/5 overflow-hidden">
+             <img src="blacksmith_forge_raw_1778819837313.png" alt="Blacksmith Workshop" class="museum-image opacity-60">
           </div>
-          <p class="text-sm font-mono leading-relaxed">
-            1200도의 열기 속에서 <br>
-            쇠는 비로소 정직해진다. <br>
-            망치 소리만이 유일한 대화.
+          <p class="text-xs font-mono leading-loose opacity-70 uppercase tracking-widest">
+            망치와 모루 사이의 <br>
+            반복되는 파동은 <br>
+            금속에 영혼을 불어넣는다.
           </p>
         </div>
 
-        <!-- Item 3: Philosophy Text Grid -->
         <div class="grid-cell col-span-12 md:col-span-4 border-r border-black flex flex-col justify-between">
-          <div class="magenta-line w-full h-[1px] active"></div>
-          <p class="text-4xl italic leading-tight py-12">
-            "칼은 베는 도구가 <br>아닌, 나를 비추는 <br><span class="text-[#8B004B]">거울</span>이다."
+          <div class="magenta-line w-12 h-[1px] mb-8 active"></div>
+          <p class="text-3xl md:text-5xl italic leading-[1.1] tracking-tighter">
+            "날은 세우는 것이 <br>아니라, <br><span class="text-[#8B004B]">찾아내는 것</span>이다."
           </p>
-          <div class="metadata">Master Jung Deuk-mook</div>
+          <div class="mt-12 metadata">Master Jung Deuk-mook</div>
         </div>
 
-        <!-- Item 4: More Archive -->
-        <div class="grid-cell col-span-12 md:col-span-8 overflow-hidden">
-          <img src="metal_texture_abstract_1778819851321.png" alt="Metal Texture" class="museum-image opacity-40">
+        <div class="grid-cell col-span-12 md:col-span-8 bg-stone-100 flex items-center justify-center overflow-hidden">
+          <img src="metal_texture_abstract_1778819851321.png" alt="Metal Texture" class="museum-image opacity-30">
           <div class="absolute inset-0 flex items-center justify-center">
-             <span class="text-xs font-mono tracking-widest uppercase text-black/50">Texture Archive 01</span>
+            <div class="text-[10px] font-mono uppercase tracking-[0.5em] text-black/50">
+              [이미지 영역 18] / 30 Years Archive Overview
+            </div>
           </div>
         </div>
       </section>
@@ -415,6 +503,33 @@
       if (document.body.classList.contains('show-cursor')) {
         cursor.style.transform = `translateX(${e.clientX}px)`;
       }
+    });
+
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (menuToggle) {
+      menuToggle.addEventListener('click', () => {
+        menuToggle.classList.toggle('open');
+        mobileMenu.classList.toggle('active');
+        
+        // Prevent scrolling when menu is open
+        if (mobileMenu.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = 'auto';
+        }
+      });
+    }
+
+    // Close mobile menu on link click
+    document.querySelectorAll('.menu-item').forEach(link => {
+      link.addEventListener('click', () => {
+        menuToggle.classList.remove('open');
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      });
     });
 
     // Scroll Reveal Observer
